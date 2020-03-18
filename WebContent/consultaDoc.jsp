@@ -148,15 +148,13 @@
 			<%
 				int id_cargo2 = Integer.parseInt(request.getParameter("id_cargo"));
 
-				if (id_cargo2 != 0) {
+				int limite = 20;
+				String numPagina = request.getParameter("numpagina");
+				if (numPagina == null)
+					numPagina = "1";
+				int offset = (Integer.parseInt(numPagina) * limite) - limite;
 
-					int limite = 20;
-					String numPagina = request.getParameter("numpagina");
-					
-					if (numPagina == null)
-						numPagina = "1";
-					
-					int offset = (Integer.parseInt(numPagina) * limite) - limite;
+				if (id_cargo2 != 0) {
 
 					PreparedStatement ps = null;
 					Connection con = null;
@@ -165,7 +163,6 @@
 					{
 
 						try {
-
 							Class.forName("org.postgresql.Driver").newInstance();
 							con = DriverManager.getConnection("jdbc:postgresql://localhost/bdseletivo", "postgres",
 									"252107");
@@ -189,8 +186,8 @@
 					<td><%=rs.getString("cpf")%></td>
 					<td><%=rs.getString("documento")%></td>
 					<td><%=rs.getString("ponto")%></td>
-					<td><a href="//<%=rs.getString("file")%>" target="_blank">Clique 
-							aqui</a></td> <!--NAVEGADOR BLOQUEANDO CAMINHO DO ARQUIVO--->
+					<td><a href="//<%=rs.getString("file")%>" target="_blank">Clique
+							aqui</a></td><!-- NAVEGADOR BLOQUEANDO CAMINHO DO ARQUIVO -->
 
 					<%
 						}
@@ -202,7 +199,8 @@
 		</table>
 
 		<%
-			//SELECT FAZENDO A CONTAGEM DE REGISTROS POR CARGO.
+			//SELECT FAZENDO A CONTAGEM DE REGISTROS POR CARGO
+
 						ps = con.prepareStatement(
 								"select cargo.id_cargo as id_cargo, count(*) AS contaRegistros from upload inner join cargo on cargo.id_cargo=upload.id_cargo where cargo.id_cargo=? GROUP BY cargo.id_cargo ");
 						ps.setInt(1, id_cargo2);
@@ -225,11 +223,11 @@
 				int pagAnterior;
 							if (Integer.parseInt(numPagina) > 1) {
 
-								pagAnterior = (Integer.parseInt(numPagina) - 1);
+								pagAnterior = Integer.parseInt(numPagina) - 1;
 
 								out.println(
-										"<li class= page-item disabled> <a class=page-link  href=consultaDoc.jsp?numPagina=&id_cargo2="
-												+ pagAnterior + "> Anterior</a></li>");
+										"<li class= page-item disabled> <a class=page-link  href= consultaDoc.jsp?numpagina="
+												+ pagAnterior + "&id_cargo=" + id_cargo2 + "> Anterior</a></li>");
 							}
 			%>
 
@@ -254,12 +252,11 @@
 
 								if (i == Integer.parseInt(numPagina))
 									out.println(
-											"<li class= page-item ><b><a class=page-link href=consultaDoc.jsp?numPagina=&id_cargo="
-													+ i + ">" + i + "</a></b></li>");
+											"<b><li class= page-item ><a class=page-link href= consultaDoc.jsp?id_cargo="
+													+ id_cargo2 + "&numpagina=" + i + ">" + i + "</a></li></b>");
 								else
-									out.println(
-											"<li class= page-item ><a class=page-link  href=consultaDoc.jsp?numPagina=&id_cargo="
-													+ i + ">" + i + "</a></li>");
+									out.println("<li class= page-item ><a class=page-link  href= consultaDoc.jsp?id_cargo="
+											+ id_cargo2 + "&numpagina=" + i + ">" + i + "</a></li>");
 							}
 			%>
 
@@ -267,11 +264,10 @@
 				int pagProxima;
 							//if ((totalRegistros - (Integer.parseInt(numPagina) * limite)) > 0) {
 
-							pagProxima = (Integer.parseInt(numPagina) + 1);
+							pagProxima = Integer.parseInt(numPagina) + 1;
 
-							out.println(
-									"<li class= page-item > <a class=page-link  href= consultaDoc.jsp?numPagina=&id_cargo="
-											+ pagProxima + "> Próximo </a></li>");
+							out.println("<li class= page-item > <a class=page-link  href= consultaDoc.jsp?numpagina="
+									+ pagProxima + "&id_cargo=" + id_cargo2 + "> Próximo </a></li>");
 							//}
 			%>
 
